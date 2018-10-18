@@ -8,3 +8,4 @@ readme = "README.md"
 repository = "https://github.com/killercup/a-range"
 
 [dependencies]
+num-traits = "0.2.6"
