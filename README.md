@@ -3,6 +3,8 @@
 > **Write quick and explict ranges in Rust**
 
 [![Build Status](https://travis-ci.com/killercup/a-range.svg?branch=master)](https://travis-ci.com/killercup/a-range)
+[![crates.io](https://img.shields.io/crates/v/a-range.svg)](https://crates.io/crates/a-range)
+[![docs](https://img.shields.io/badge/api_docs-latest-blue.svg)](https://docs.rs/a-range)
 
 ## License
 
