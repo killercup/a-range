@@ -19,7 +19,7 @@
 
 extern crate num_traits;
 
-use num_traits::One;
+use num_traits::{Bounded, One};
 use std::iter::FromIterator;
 use std::ops::{AddAssign, SubAssign};
 
@@ -63,6 +63,29 @@ impl<Idx> From<Idx> {
             from: self.from,
             to: x,
             direction: Downwards,
+        }
+    }
+}
+
+impl<Idx> From<Idx>
+where
+    Idx: Bounded,
+{
+    /// Construct a [Range] that counts up to `Idx`'s maximum value.
+    ///
+    /// ```rust
+    /// extern crate a_range;
+    ///
+    /// let range = a_range::from(10).up_to_infinity();
+    ///
+    /// let v: Vec<i32> = range.into_iter().take(5).collect::<Vec<i32>>();
+    /// assert_eq!(v, vec![10, 11, 12, 13, 14]);
+    /// ```
+    pub fn up_to_infinity(self) -> Range<Idx, Upwards> {
+        Range {
+            from: self.from,
+            to: Idx::max_value(),
+            direction: Upwards,
         }
     }
 }
