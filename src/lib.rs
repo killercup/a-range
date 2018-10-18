@@ -165,6 +165,49 @@ where
     }
 }
 
+/// Conversions to std::ops::Range*
+impl<Idx> Range<Idx, Upwards>
+where
+    Idx: Clone + One + AddAssign,
+{
+    /// Turn range into a [std::ops::Range]
+    pub fn as_std_range(&self) -> std::ops::Range<Idx> {
+        // std::ops::Range upper bounds are excluded, so add one
+        let mut to = self.to.clone();
+        to += Idx::one();
+
+        self.from.clone()..to
+    }
+}
+
+impl<Idx> Into<std::ops::Range<Idx>> for Range<Idx, Upwards>
+where
+    Idx: Clone + One + AddAssign,
+{
+    fn into(self) -> std::ops::Range<Idx> {
+        self.as_std_range()
+    }
+}
+
+impl<Idx> Range<Idx, Upwards>
+where
+    Idx: Clone,
+{
+    /// Turn range into a [std::ops::RangeInclusive]
+    pub fn as_std_range_inclusive(&self) -> std::ops::RangeInclusive<Idx> {
+        self.from.clone()..=self.to.clone()
+    }
+}
+
+impl<Idx> Into<std::ops::RangeInclusive<Idx>> for Range<Idx, Upwards>
+where
+    Idx: Clone,
+{
+    fn into(self) -> std::ops::RangeInclusive<Idx> {
+        self.as_std_range_inclusive()
+    }
+}
+
 /// Iterator over a range
 pub struct RangeIter<Idx, Direction> {
     current: Idx,
@@ -230,4 +273,26 @@ fn range_collect() {
 fn rev_range_collect() {
     let x: Vec<i32> = from(14).down_to(10).into_iter().take(10).collect();
     assert_eq!(x, vec![14, 13, 12, 11, 10]);
+}
+
+#[test]
+fn as_std_range() {
+    let r = from(10).up_to(14);
+
+    let u: Vec<i32> = r.as_std_range().into_iter().take(10).collect();
+    let v: Vec<i32> = r.into_iter().take(10).collect();
+
+    assert_eq!(u, vec![10, 11, 12, 13, 14]);
+    assert_eq!(v, vec![10, 11, 12, 13, 14]);
+}
+
+#[test]
+fn as_std_range_inclusive() {
+    let r = from(10).up_to(14);
+
+    let u: Vec<i32> = r.as_std_range_inclusive().into_iter().take(10).collect();
+    let v: Vec<i32> = r.into_iter().take(10).collect();
+
+    assert_eq!(u, vec![10, 11, 12, 13, 14]);
+    assert_eq!(v, vec![10, 11, 12, 13, 14]);
 }
