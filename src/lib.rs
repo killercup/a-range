@@ -53,7 +53,7 @@ impl<Idx> From<Idx> {
         Range {
             from: self.from,
             to: x,
-            direction: Upwards
+            direction: Upwards,
         }
     }
 
@@ -112,15 +112,15 @@ where
 
 /// Range counting down
 impl<Idx> Range<Idx, Downwards>
-    where
-        Idx: Clone + PartialEq + One + AddAssign + SubAssign,
+where
+    Idx: Clone + PartialEq + One + AddAssign + SubAssign,
 {
     /// Collect range into a container
     ///
     /// Works for any container type that implements [`FromIterator`].
     pub fn collect<B>(self) -> B
-        where
-            B: FromIterator<Idx>,
+    where
+        B: FromIterator<Idx>,
     {
         self.into_iter().collect()
     }
@@ -169,7 +169,8 @@ where
 pub struct RangeIter<Idx, Direction> {
     current: Idx,
     limit: Idx,
-    #[allow(unused)] direction: Direction,
+    #[allow(unused)]
+    direction: Direction,
     init: bool,
 }
 
