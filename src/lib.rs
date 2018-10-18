@@ -42,6 +42,7 @@ pub fn from<Idx>(i: Idx) -> From<Idx> {
 /// Constructed using [`from()`]
 ///
 /// The the methods provided for this type to build a [Range].
+#[derive(Clone, Debug, Hash, PartialEq, Eq, PartialOrd)]
 pub struct From<Idx> {
     from: Idx,
 }
@@ -73,14 +74,20 @@ impl<Idx> From<Idx> {
 /// The index type can be any type, but to get a useful range, you need to supply something that
 /// implements some common traits, like [Clone], and [PartialEq]; but also [One] (the identity
 /// element used) as well as [AddAssign] and [SubAssign] (to work increment/decrement the index).
+#[derive(Clone, Debug, Hash, PartialEq, Eq, PartialOrd)]
 pub struct Range<Idx, Direction> {
+    direction: Direction,
     from: Idx,
     to: Idx,
-    direction: Direction,
 }
 
-#[doc(hidden)] pub struct Upwards;
-#[doc(hidden)] pub struct Downwards;
+#[doc(hidden)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq, PartialOrd)]
+pub struct Upwards;
+
+#[doc(hidden)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq, PartialOrd)]
+pub struct Downwards;
 
 /// Range counting up
 impl<Idx> Range<Idx, Upwards>
@@ -98,8 +105,8 @@ where
     }
 
     /// Turn range into a [Vec]
-    pub fn to_vec(self) -> Vec<Idx> {
-        self.into_iter().collect()
+    pub fn to_vec(&self) -> Vec<Idx> {
+        self.clone().into_iter().collect()
     }
 }
 
@@ -119,8 +126,8 @@ impl<Idx> Range<Idx, Downwards>
     }
 
     /// Turn range into a [Vec]
-    pub fn to_vec(self) -> Vec<Idx> {
-        self.into_iter().collect()
+    pub fn to_vec(&self) -> Vec<Idx> {
+        self.clone().into_iter().collect()
     }
 }
 
