@@ -274,6 +274,24 @@ pub struct RangeIter<Idx, Direction> {
     init: bool,
 }
 
+/// Iterate over a reverse range
+///
+/// # Examples
+///
+/// ```rust
+/// extern crate a_range;
+///
+/// let x = a_range::from(1).up_to(3);
+/// let mut iter = x.into_iter();
+///
+/// // Each call to `next()` gives us the next number in the range:
+/// assert_eq!(iter.next(), Some(1));
+/// assert_eq!(iter.next(), Some(2));
+/// assert_eq!(iter.next(), Some(3));
+///
+/// // Until the range is done
+/// assert_eq!(iter.next(), None);
+/// ```
 impl<Idx> Iterator for RangeIter<Idx, Upwards>
 where
     Idx: Clone + PartialEq + One + AddAssign + SubAssign,
@@ -297,6 +315,24 @@ where
     }
 }
 
+/// Iterate over a reverse range
+///
+/// # Examples
+///
+/// ```rust
+/// extern crate a_range;
+///
+/// let x = a_range::from(3).down_to(1);
+/// let mut iter = x.into_iter();
+///
+/// // Each call to `next()` gives us the next number in the range:
+/// assert_eq!(iter.next(), Some(3));
+/// assert_eq!(iter.next(), Some(2));
+/// assert_eq!(iter.next(), Some(1));
+///
+/// // Until the range is done
+/// assert_eq!(iter.next(), None);
+/// ```
 impl<Idx> Iterator for RangeIter<Idx, Downwards>
 where
     Idx: Clone + PartialEq + One + AddAssign + SubAssign,
