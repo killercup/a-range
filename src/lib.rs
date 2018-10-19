@@ -47,9 +47,20 @@ pub struct From<Idx> {
     from: Idx,
 }
 
-impl<Idx> From<Idx> {
+impl<Idx> From<Idx>
+where
+    Idx: PartialOrd,
+{
     /// Construct a [Range] that counts up to the given item.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic when trying to create a [Range] where the upper bound is less than the lower bound.
     pub fn up_to(self, x: Idx) -> Range<Idx, Upwards> {
+        if self.from > x {
+            panic!("Invalid range: upper bound cannot be lesser than lower bound!");
+        }
+
         Range {
             from: self.from,
             to: x,
@@ -58,7 +69,15 @@ impl<Idx> From<Idx> {
     }
 
     /// Construct a [Range] that counts down to the given item.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic when trying to create a [Range] where the lower bound is less than the upper bound.
     pub fn down_to(self, x: Idx) -> Range<Idx, Downwards> {
+        if self.from < x {
+            panic!("Invalid range: lower bound cannot be lesser than upper bound!");
+        }
+
         Range {
             from: self.from,
             to: x,
@@ -318,4 +337,30 @@ fn as_std_range_inclusive() {
 
     assert_eq!(u, vec![10, 11, 12, 13, 14]);
     assert_eq!(v, vec![10, 11, 12, 13, 14]);
+}
+
+#[test]
+#[should_panic]
+fn fail_up_to_invalid_range() {
+    from(40).up_to(39);
+}
+
+#[test]
+#[should_panic]
+fn fail_down_to_invalid_range() {
+    from(40).down_to(41);
+}
+
+#[test]
+fn up_to_equivalent_val() {
+    let r = from(10).up_to(10);
+
+    assert_eq!(r.to_vec(), vec![10]);
+}
+
+#[test]
+fn down_to_equivalent_val() {
+    let r = from(10).down_to(10);
+
+    assert_eq!(r.to_vec(), vec![10]);
 }
