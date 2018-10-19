@@ -10,5 +10,12 @@ repository = "https://github.com/killercup/a-range"
 [dependencies]
 num-traits = "0.2.6"
 
+[features]
+nightly = []
+
 [badges]
 travis-ci = { repository = "killercup/a-range" }
+
+[package.metadata.docs.rs]
+features = ["nightly"]
+no-default-features = true

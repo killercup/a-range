@@ -6,6 +6,23 @@
 [![crates.io](https://img.shields.io/crates/v/a-range.svg)](https://crates.io/crates/a-range)
 [![docs](https://img.shields.io/badge/api_docs-latest-blue.svg)](https://docs.rs/a-range)
 
+Create ranges in a very explicit manner
+
+Start with the [`from()`] function and build up a range using [`From::up_to`] or
+[`From::down_to`].
+
+# Examples
+
+```rust
+extern crate a_range;
+
+let x = a_range::from(5).up_to(7);
+assert_eq!(x.to_vec(), vec![5, 6, 7]);
+
+let x = a_range::from(3).down_to(1);
+assert_eq!(x.to_vec(), vec![3, 2, 1]);
+```
+
 ## License
 
 Licensed under either of
