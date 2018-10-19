@@ -114,8 +114,13 @@ where
 /// This is basically a start, and end, an a direction.
 ///
 /// The index type can be any type, but to get a useful range, you need to supply something that
-/// implements some common traits, like [Clone], and [PartialEq]; but also [One] (the identity
-/// element used) as well as [AddAssign] and [SubAssign] (to work increment/decrement the index).
+/// implements some common traits, like [`Clone`], and [`PartialEq`]; but also [`One`] (the identity
+/// element used) as well as [`AddAssign`] and [`SubAssign`] (to work increment/decrement the index).
+///
+/// # Note
+///
+/// This is generic over the index. The type parameter for the direction is an implementation
+/// detail to ensure this is a type-level constant (instead of it being checked at runtime).
 #[derive(Clone, Debug, Hash, PartialEq, Eq, PartialOrd)]
 pub struct Range<Idx, Direction> {
     direction: Direction,
@@ -207,12 +212,12 @@ where
     }
 }
 
-/// Conversions to std::ops::Range*
+/// Conversions to [`std::ops::Range`]
 impl<Idx> Range<Idx, Upwards>
 where
     Idx: Clone + One + AddAssign,
 {
-    /// Turn range into a [std::ops::Range]
+    /// Turn range into a [`std::ops::Range`]
     pub fn as_std_range(&self) -> std::ops::Range<Idx> {
         // std::ops::Range upper bounds are excluded, so add one
         let mut to = self.to.clone();
@@ -222,6 +227,7 @@ where
     }
 }
 
+/// Conversions to [`std::ops::Range`]
 impl<Idx> Into<std::ops::Range<Idx>> for Range<Idx, Upwards>
 where
     Idx: Clone + One + AddAssign,
@@ -231,16 +237,18 @@ where
     }
 }
 
+/// Conversions to [`std::ops::RangeInclusive`]
 impl<Idx> Range<Idx, Upwards>
 where
     Idx: Clone,
 {
-    /// Turn range into a [std::ops::RangeInclusive]
+    /// Turn range into a [`std::ops::RangeInclusive`]
     pub fn as_std_range_inclusive(&self) -> std::ops::RangeInclusive<Idx> {
         self.from.clone()..=self.to.clone()
     }
 }
 
+/// Conversions to [`std::ops::RangeInclusive`]
 impl<Idx> Into<std::ops::RangeInclusive<Idx>> for Range<Idx, Upwards>
 where
     Idx: Clone,
@@ -251,6 +259,13 @@ where
 }
 
 /// Iterator over a range
+///
+/// Construct this by calling `into_iter()` on a [`Range`].
+///
+/// # Note
+///
+/// This is generic over the index. The type parameter for the direction is an implementation
+/// detail to ensure this is a type-level constant (instead of it being checked at runtime).
 pub struct RangeIter<Idx, Direction> {
     current: Idx,
     limit: Idx,
