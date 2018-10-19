@@ -14,6 +14,20 @@
 //! let x = a_range::from(3).down_to(1);
 //! assert_eq!(x.to_vec(), vec![3, 2, 1]);
 //! ```
+//!
+//! Note that the created ranges are _ends-inclusive._
+//!
+//! Single element ranges are also possible!
+//!
+//! ```rust
+//! # extern crate a_range;
+//!
+//! let up_range = a_range::from(10).up_to(10);
+//! assert_eq!(up_range.to_vec(), vec![10]);
+//!
+//! let down_range = a_range::from(10).down_to(10);
+//! assert_eq!(down_range.to_vec(), vec![10]);
+//! ```
 
 #![warn(missing_docs)]
 
