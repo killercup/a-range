@@ -218,6 +218,16 @@ where
     Idx: Clone + One + AddAssign,
 {
     /// Turn range into a [`std::ops::Range`]
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// extern crate a_range;
+    ///
+    /// let std_range = a_range::from(42).up_to(48).as_std_range();
+    ///
+    /// assert_eq!(std_range, 42..49);
+    /// ```
     pub fn as_std_range(&self) -> std::ops::Range<Idx> {
         // std::ops::Range upper bounds are excluded, so add one
         let mut to = self.to.clone();
@@ -232,6 +242,17 @@ impl<Idx> Into<std::ops::Range<Idx>> for Range<Idx, Upwards>
 where
     Idx: Clone + One + AddAssign,
 {
+    /// Turn range into a [`std::ops::Range`]
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// extern crate a_range;
+    ///
+    /// let std_range: std::ops::Range<_> = a_range::from(42).up_to(48).into();
+    ///
+    /// assert_eq!(std_range, 42..49);
+    /// ```
     fn into(self) -> std::ops::Range<Idx> {
         self.as_std_range()
     }
@@ -243,6 +264,16 @@ where
     Idx: Clone,
 {
     /// Turn range into a [`std::ops::RangeInclusive`]
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// extern crate a_range;
+    ///
+    /// let std_range = a_range::from(42).up_to(48).as_std_range_inclusive();
+    ///
+    /// assert_eq!(std_range, 42..=48);
+    /// ```
     pub fn as_std_range_inclusive(&self) -> std::ops::RangeInclusive<Idx> {
         self.from.clone()..=self.to.clone()
     }
@@ -253,6 +284,17 @@ impl<Idx> Into<std::ops::RangeInclusive<Idx>> for Range<Idx, Upwards>
 where
     Idx: Clone,
 {
+    /// Turn range into a [`std::ops::RangeInclusive`]
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// extern crate a_range;
+    ///
+    /// let std_range: std::ops::RangeInclusive<_> = a_range::from(42).up_to(48).into();
+    ///
+    /// assert_eq!(std_range, 42..=48);
+    /// ```
     fn into(self) -> std::ops::RangeInclusive<Idx> {
         self.as_std_range_inclusive()
     }
@@ -366,28 +408,6 @@ fn range_collect() {
 fn rev_range_collect() {
     let x: Vec<i32> = from(14).down_to(10).into_iter().take(10).collect();
     assert_eq!(x, vec![14, 13, 12, 11, 10]);
-}
-
-#[test]
-fn as_std_range() {
-    let r = from(10).up_to(14);
-
-    let u: Vec<i32> = r.as_std_range().into_iter().take(10).collect();
-    let v: Vec<i32> = r.into_iter().take(10).collect();
-
-    assert_eq!(u, vec![10, 11, 12, 13, 14]);
-    assert_eq!(v, vec![10, 11, 12, 13, 14]);
-}
-
-#[test]
-fn as_std_range_inclusive() {
-    let r = from(10).up_to(14);
-
-    let u: Vec<i32> = r.as_std_range_inclusive().into_iter().take(10).collect();
-    let v: Vec<i32> = r.into_iter().take(10).collect();
-
-    assert_eq!(u, vec![10, 11, 12, 13, 14]);
-    assert_eq!(v, vec![10, 11, 12, 13, 14]);
 }
 
 #[test]
