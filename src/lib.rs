@@ -52,6 +52,10 @@ where
     Idx: PartialOrd,
 {
     /// Construct a [Range] that counts up to the given item.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic when trying to create a [Range] where the upper bound is less than the lower bound.
     pub fn up_to(self, x: Idx) -> Range<Idx, Upwards> {
         if self.from > x {
             panic!("Invalid range: upper bound cannot be lesser than lower bound!");
@@ -65,6 +69,10 @@ where
     }
 
     /// Construct a [Range] that counts down to the given item.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic when trying to create a [Range] where the lower bound is less than the upper bound.
     pub fn down_to(self, x: Idx) -> Range<Idx, Downwards> {
         if self.from < x {
             panic!("Invalid range: lower bound cannot be lesser than upper bound!");
