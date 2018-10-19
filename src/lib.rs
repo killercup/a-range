@@ -20,7 +20,8 @@
 extern crate num_traits;
 
 #[cfg(test)]
-#[macro_use] extern crate proptest;
+#[macro_use]
+extern crate proptest;
 
 use num_traits::{Bounded, One};
 use std::iter::FromIterator;
