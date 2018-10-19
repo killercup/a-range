@@ -111,7 +111,7 @@ where
 
 /// A range
 ///
-/// This is basically a start, and end, an a direction.
+/// This is basically a start, and end, and a direction.
 ///
 /// The index type can be any type, but to get a useful range, you need to supply something that
 /// implements some common traits, like [`Clone`], and [`PartialEq`]; but also [`One`] (the identity
