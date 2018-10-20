@@ -4,6 +4,10 @@
 
 extern crate num_traits;
 
+#[cfg(test)]
+#[macro_use]
+extern crate proptest;
+
 use num_traits::{Bounded, One};
 use std::iter::FromIterator;
 use std::ops::{AddAssign, SubAssign};
@@ -96,7 +100,7 @@ where
 
 /// A range
 ///
-/// This is basically a start, and end, an a direction.
+/// This is basically a start, and end, and a direction.
 ///
 /// The index type can be any type, but to get a useful range, you need to supply something that
 /// implements some common traits, like [`Clone`], and [`PartialEq`]; but also [`One`] (the identity
@@ -203,6 +207,16 @@ where
     Idx: Clone + One + AddAssign,
 {
     /// Turn range into a [`std::ops::Range`]
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// extern crate a_range;
+    ///
+    /// let std_range = a_range::from(42).up_to(48).as_std_range();
+    ///
+    /// assert_eq!(std_range, 42..49);
+    /// ```
     pub fn as_std_range(&self) -> std::ops::Range<Idx> {
         // std::ops::Range upper bounds are excluded, so add one
         let mut to = self.to.clone();
@@ -217,6 +231,17 @@ impl<Idx> Into<std::ops::Range<Idx>> for Range<Idx, Upwards>
 where
     Idx: Clone + One + AddAssign,
 {
+    /// Turn range into a [`std::ops::Range`]
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// extern crate a_range;
+    ///
+    /// let std_range: std::ops::Range<_> = a_range::from(42).up_to(48).into();
+    ///
+    /// assert_eq!(std_range, 42..49);
+    /// ```
     fn into(self) -> std::ops::Range<Idx> {
         self.as_std_range()
     }
@@ -228,6 +253,16 @@ where
     Idx: Clone,
 {
     /// Turn range into a [`std::ops::RangeInclusive`]
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// extern crate a_range;
+    ///
+    /// let std_range = a_range::from(42).up_to(48).as_std_range_inclusive();
+    ///
+    /// assert_eq!(std_range, 42..=48);
+    /// ```
     pub fn as_std_range_inclusive(&self) -> std::ops::RangeInclusive<Idx> {
         self.from.clone()..=self.to.clone()
     }
@@ -238,6 +273,17 @@ impl<Idx> Into<std::ops::RangeInclusive<Idx>> for Range<Idx, Upwards>
 where
     Idx: Clone,
 {
+    /// Turn range into a [`std::ops::RangeInclusive`]
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// extern crate a_range;
+    ///
+    /// let std_range: std::ops::RangeInclusive<_> = a_range::from(42).up_to(48).into();
+    ///
+    /// assert_eq!(std_range, 42..=48);
+    /// ```
     fn into(self) -> std::ops::RangeInclusive<Idx> {
         self.as_std_range_inclusive()
     }
@@ -354,28 +400,6 @@ fn rev_range_collect() {
 }
 
 #[test]
-fn as_std_range() {
-    let r = from(10).up_to(14);
-
-    let u: Vec<i32> = r.as_std_range().into_iter().take(10).collect();
-    let v: Vec<i32> = r.into_iter().take(10).collect();
-
-    assert_eq!(u, vec![10, 11, 12, 13, 14]);
-    assert_eq!(v, vec![10, 11, 12, 13, 14]);
-}
-
-#[test]
-fn as_std_range_inclusive() {
-    let r = from(10).up_to(14);
-
-    let u: Vec<i32> = r.as_std_range_inclusive().into_iter().take(10).collect();
-    let v: Vec<i32> = r.into_iter().take(10).collect();
-
-    assert_eq!(u, vec![10, 11, 12, 13, 14]);
-    assert_eq!(v, vec![10, 11, 12, 13, 14]);
-}
-
-#[test]
 #[should_panic]
 fn fail_up_to_invalid_range() {
     from(40).up_to(39);
@@ -399,4 +423,47 @@ fn down_to_equivalent_val() {
     let r = from(10).down_to(10);
 
     assert_eq!(r.to_vec(), vec![10]);
+}
+
+#[cfg(test)]
+proptest! {
+    #[test]
+    fn proptest_as_std_range(beg in 0u8..255, end in 0u8..255) { // 255 to prevent overflow
+        prop_assume!(beg <= end);
+
+        let r = from(beg).up_to(end);
+
+        let u: Vec<_> = r.as_std_range().collect();
+        let v: Vec<_> = r.into_iter().collect();
+
+        prop_assert_eq!(u, v);
+    }
+
+    #[test]
+    fn proptest_as_std_range_inclusive(beg in 0u8.., end in 0u8..) {
+        prop_assume!(beg <= end);
+
+        let r = from(beg).up_to(end);
+
+        let u: Vec<_> = r.as_std_range_inclusive().collect();
+        let v: Vec<_> = r.into_iter().collect();
+
+        prop_assert_eq!(u, v);
+    }
+
+    #[test]
+    fn up_to_iter_length(beg in 0usize..10000, end in 0usize..10000) {
+        prop_assume!(beg <= end);
+
+        let range = from(beg).up_to(end);
+        prop_assert_eq!(range.into_iter().count(), end - beg + 1);
+    }
+
+    #[test]
+    fn down_to_iter_length(beg in 0usize..10000, end in 0usize..10000) {
+        prop_assume!(beg >= end);
+
+        let range = from(beg).down_to(end);
+        prop_assert_eq!(range.into_iter().count(), beg - end + 1);
+    }
 }
