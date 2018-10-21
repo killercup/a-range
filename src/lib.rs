@@ -65,6 +65,17 @@ pub struct From<Idx> {
     from: Idx,
 }
 
+/// Implement copy for From instances with copyable indices
+impl<T: Copy> Copy for From<T> {}
+
+#[test]
+fn copyable_from_is_copy() {
+    fn is_copy<T: Copy>(_x: T) {}
+
+    let range = From { from: 0 };
+    is_copy(range);
+}
+
 impl<Idx> From<Idx>
 where
     Idx: PartialOrd,
@@ -146,12 +157,27 @@ pub struct Range<Idx, Direction> {
     to: Idx,
 }
 
+/// Implement copy for Ranges with copyable indices
+impl<T: Copy, Direction: Copy> Copy for Range<T, Direction> {}
+
+#[test]
+fn copyable_range_is_copy() {
+    fn is_copy<T: Copy>(_x: T) {}
+
+    let range = Range {
+        direction: Upwards,
+        from: 0,
+        to: 100,
+    };
+    is_copy(range);
+}
+
 #[doc(hidden)]
-#[derive(Clone, Debug, Hash, PartialEq, Eq, PartialOrd)]
+#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, PartialOrd)]
 pub struct Upwards;
 
 #[doc(hidden)]
-#[derive(Clone, Debug, Hash, PartialEq, Eq, PartialOrd)]
+#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, PartialOrd)]
 pub struct Downwards;
 
 /// Range counting up
