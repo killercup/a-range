@@ -162,6 +162,30 @@ where
     /// Collect range into a container
     ///
     /// Works for any container type that implements [`FromIterator`].
+    ///
+    /// # Examples
+    ///
+    /// Basic usage, creating a [`Vec`]. See also [`Range::to_vec`]
+    ///
+    /// ```rust
+    /// extern crate a_range;
+    ///
+    /// let collection: Vec<_> = a_range::from(42).up_to(45).collect();
+    ///
+    /// assert_eq!(collection, vec![42, 43, 44, 45]);
+    /// ```
+    ///
+    /// Using `collect()` to make a [`std::collections::HashSet`]
+    ///
+    /// ```rust
+    /// extern crate a_range;
+    /// use std::collections::HashSet;
+    ///
+    /// let collection: HashSet<_> = a_range::from(42).up_to(45).collect();
+    ///
+    /// assert!(collection.contains(&42));
+    /// ```
+    ///
     pub fn collect<B>(self) -> B
     where
         B: FromIterator<Idx>,
@@ -170,6 +194,16 @@ where
     }
 
     /// Turn range into a [Vec]
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// extern crate a_range;
+    ///
+    /// let vector = a_range::from(42).up_to(45).to_vec();
+    ///
+    /// assert_eq!(vector, vec![42, 43, 44, 45]);
+    /// ```
     pub fn to_vec(&self) -> Vec<Idx> {
         self.clone().into_iter().collect()
     }
@@ -183,6 +217,29 @@ where
     /// Collect range into a container
     ///
     /// Works for any container type that implements [`FromIterator`].
+    ///
+    /// # Examples
+    ///
+    /// Basic usage, creating a [`Vec`]. See also [`Range::to_vec`]
+    ///
+    /// ```rust
+    /// extern crate a_range;
+    ///
+    /// let collection: Vec<_> = a_range::from(42).down_to(38).collect();
+    ///
+    /// assert_eq!(collection, vec![42, 41, 40, 39, 38]);
+    /// ```
+    ///
+    /// Using `collect()` to make a [`std::collections::HashSet`]
+    ///
+    /// ```rust
+    /// extern crate a_range;
+    /// use std::collections::HashSet;
+    ///
+    /// let collection: HashSet<_> = a_range::from(42).down_to(38).collect();
+    ///
+    /// assert!(collection.contains(&39));
+    /// ```
     pub fn collect<B>(self) -> B
     where
         B: FromIterator<Idx>,
@@ -191,6 +248,16 @@ where
     }
 
     /// Turn range into a [Vec]
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// extern crate a_range;
+    ///
+    /// let vector = a_range::from(42).down_to(38).to_vec();
+    ///
+    /// assert_eq!(vector, vec![42, 41, 40, 39, 38]);
+    /// ```
     pub fn to_vec(&self) -> Vec<Idx> {
         self.clone().into_iter().collect()
     }
