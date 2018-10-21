@@ -170,7 +170,7 @@ where
     /// ```rust
     /// extern crate a_range;
     ///
-    /// let collection = a_range::from(42).up_to(45).collect::<Vec<_>>();
+    /// let collection: Vec<_> = a_range::from(42).up_to(45).collect();
     ///
     /// assert_eq!(collection, vec![42, 43, 44, 45]);
     /// ```
@@ -181,7 +181,7 @@ where
     /// extern crate a_range;
     /// use std::collections::HashSet;
     ///
-    /// let collection = a_range::from(42).up_to(45).collect::<HashSet<_>>();
+    /// let collection: HashSet<_> = a_range::from(42).up_to(45).collect();
     ///
     /// assert!(collection.contains(&42));
     /// ```
@@ -217,6 +217,7 @@ where
     /// Collect range into a container
     ///
     /// Works for any container type that implements [`FromIterator`].
+    ///
     /// # Examples
     ///
     /// Basic usage, creating a [`Vec`]. See also [`Range::to_vec`]
@@ -224,7 +225,7 @@ where
     /// ```rust
     /// extern crate a_range;
     ///
-    /// let collection = a_range::from(42).down_to(38).collect::<Vec<_>>();
+    /// let collection: Vec<_> = a_range::from(42).down_to(38).collect();
     ///
     /// assert_eq!(collection, vec![42, 41, 40, 39, 38]);
     /// ```
@@ -235,7 +236,7 @@ where
     /// extern crate a_range;
     /// use std::collections::HashSet;
     ///
-    /// let collection = a_range::from(42).down_to(38).collect::<HashSet<_>>();
+    /// let collection: HashSet<_> = a_range::from(42).down_to(38).collect();
     ///
     /// assert!(collection.contains(&39));
     /// ```
