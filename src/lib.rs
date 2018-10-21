@@ -23,6 +23,9 @@ extern crate num_traits;
 #[macro_use]
 extern crate proptest;
 
+#[cfg(test)]
+extern crate docmatic;
+
 use num_traits::{Bounded, One};
 use std::iter::FromIterator;
 use std::ops::{AddAssign, SubAssign};
@@ -400,6 +403,11 @@ where
 
         Some(self.current.clone())
     }
+}
+
+#[test]
+fn readme_code_examples() {
+    docmatic::assert_file("README.md");
 }
 
 #[test]

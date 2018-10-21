@@ -12,6 +12,7 @@ num-traits = "0.2.6"
 
 [dev-dependencies]
 proptest = "0.8.7"
+docmatic = "0.1"
 
 [badges]
 travis-ci = { repository = "killercup/a-range" }
