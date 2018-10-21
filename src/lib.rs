@@ -39,6 +39,7 @@ extern crate proptest;
 
 use num_traits::{Bounded, One};
 use std::iter::FromIterator;
+use std::marker::PhantomData;
 use std::ops::{AddAssign, SubAssign};
 
 /// Start constructing a new [Range].
@@ -93,7 +94,7 @@ where
         Range {
             from: self.from,
             to: x,
-            direction: Upwards,
+            direction: PhantomData,
         }
     }
 
@@ -110,7 +111,7 @@ where
         Range {
             from: self.from,
             to: x,
-            direction: Downwards,
+            direction: PhantomData,
         }
     }
 }
@@ -133,7 +134,7 @@ where
         Range {
             from: self.from,
             to: Idx::max_value(),
-            direction: Upwards,
+            direction: PhantomData,
         }
     }
 }
@@ -152,7 +153,7 @@ where
 /// detail to ensure this is a type-level constant (instead of it being checked at runtime).
 #[derive(Clone, Debug, Hash, PartialEq, Eq, PartialOrd)]
 pub struct Range<Idx, Direction> {
-    direction: Direction,
+    direction: PhantomData<Direction>,
     from: Idx,
     to: Idx,
 }
@@ -164,11 +165,7 @@ impl<T: Copy, Direction: Copy> Copy for Range<T, Direction> {}
 fn copyable_range_is_copy() {
     fn is_copy<T: Copy>(_x: T) {}
 
-    let range = Range {
-        direction: Upwards,
-        from: 0,
-        to: 100,
-    };
+    let range = from(0).up_to(100);
     is_copy(range);
 }
 
@@ -300,7 +297,7 @@ where
         RangeIter {
             current: self.from,
             limit: self.to,
-            direction: self.direction,
+            direction: PhantomData,
             init: false,
         }
     }
@@ -317,7 +314,7 @@ where
         RangeIter {
             current: self.from,
             limit: self.to,
-            direction: self.direction,
+            direction: PhantomData,
             init: false,
         }
     }
@@ -422,8 +419,7 @@ where
 pub struct RangeIter<Idx, Direction> {
     current: Idx,
     limit: Idx,
-    #[allow(unused)]
-    direction: Direction,
+    direction: PhantomData<Direction>,
     init: bool,
 }
 
