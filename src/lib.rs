@@ -188,6 +188,24 @@ impl<Idx> Range<Idx, Upwards>
 where
     Idx: Clone + PartialEq + One + AddAssign + SubAssign,
 {
+    /// Returns an iterator without consuming the range
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// extern crate a_range;
+    ///
+    /// let mut collection = Vec::new();
+    /// for i in a_range::from(1).up_to(3).iter() {
+    ///     collection.push(i * 3);
+    /// }
+    ///
+    /// assert_eq!(collection, vec![3, 6, 9]);
+    /// ```
+    pub fn iter(&self) -> RangeIter<Idx, Upwards> {
+        self.into_iter()
+    }
+
     /// Collect range into a container
     ///
     /// Works for any container type that implements [`FromIterator`].
@@ -234,7 +252,7 @@ where
     /// assert_eq!(vector, vec![42, 43, 44, 45]);
     /// ```
     pub fn to_vec(&self) -> Vec<Idx> {
-        self.clone().into_iter().collect()
+        self.iter().collect()
     }
 }
 
@@ -243,6 +261,24 @@ impl<Idx> Range<Idx, Downwards>
 where
     Idx: Clone + PartialEq + One + AddAssign + SubAssign,
 {
+    /// Returns an iterator without consuming the range
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// extern crate a_range;
+    ///
+    /// let mut collection = Vec::new();
+    /// for i in a_range::from(3).down_to(1).iter() {
+    ///     collection.push(i * 3);
+    /// }
+    ///
+    /// assert_eq!(collection, vec![9, 6, 3]);
+    /// ```
+    pub fn iter(&self) -> RangeIter<Idx, Downwards> {
+        self.into_iter()
+    }
+
     /// Collect range into a container
     ///
     /// Works for any container type that implements [`FromIterator`].
@@ -288,7 +324,24 @@ where
     /// assert_eq!(vector, vec![42, 41, 40, 39, 38]);
     /// ```
     pub fn to_vec(&self) -> Vec<Idx> {
-        self.clone().into_iter().collect()
+        self.into_iter().collect()
+    }
+}
+
+impl<'a, Idx> IntoIterator for &'a Range<Idx, Upwards>
+where
+    Idx: Clone + PartialEq + One + AddAssign + SubAssign,
+{
+    type Item = Idx;
+    type IntoIter = RangeIter<Idx, Upwards>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        RangeIter {
+            current: self.from.clone(),
+            limit: self.to.clone(),
+            direction: self.direction,
+            init: false,
+        }
     }
 }
 
@@ -320,6 +373,23 @@ where
         RangeIter {
             current: self.from,
             limit: self.to,
+            direction: self.direction,
+            init: false,
+        }
+    }
+}
+
+impl<'a, Idx> IntoIterator for &'a Range<Idx, Downwards>
+where
+    Idx: Clone + PartialEq + One + AddAssign + SubAssign,
+{
+    type Item = Idx;
+    type IntoIter = RangeIter<Idx, Downwards>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        RangeIter {
+            current: self.from.clone(),
+            limit: self.to.clone(),
             direction: self.direction,
             init: false,
         }
