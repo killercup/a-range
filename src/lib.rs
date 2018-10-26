@@ -81,7 +81,7 @@ fn copyable_from_is_copy() {
 
 impl<Idx> From<Idx>
 where
-    Idx: PartialOrd,
+    Idx: PartialOrd + One + AddAssign + SubAssign,
 {
     /// Construct a [Range] that counts up to the given item.
     ///
@@ -120,7 +120,7 @@ where
 
 impl<Idx> From<Idx>
 where
-    Idx: Bounded,
+    Idx: Bounded + One + AddAssign + SubAssign,
 {
     /// Construct a [Range] that counts up to `Idx`'s maximum value.
     ///
@@ -154,14 +154,17 @@ where
 /// This is generic over the index. The type parameter for the direction is an implementation
 /// detail to ensure this is a type-level constant (instead of it being checked at runtime).
 #[derive(Clone, Debug, Hash, PartialEq, Eq, PartialOrd)]
-pub struct Range<Idx, Direction> {
-    direction: Direction,
+pub struct Range<Idx, Dir>
+where
+    Dir: Direction<Idx>,
+{
+    direction: Dir,
     from: Idx,
     to: Idx,
 }
 
 /// Implement copy for Ranges with copyable indices
-impl<T: Copy, Direction: Copy> Copy for Range<T, Direction> {}
+impl<T: Copy, Dir: Copy + Direction<T>> Copy for Range<T, Dir> {}
 
 #[test]
 fn copyable_range_is_copy() {
@@ -183,10 +186,34 @@ pub struct Upwards;
 #[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, PartialOrd)]
 pub struct Downwards;
 
+#[doc(hidden)]
+pub trait Direction<Idx> {
+    fn step(i: &mut Idx);
+}
+
+impl<Idx> Direction<Idx> for Upwards
+where
+    Idx: One + AddAssign,
+{
+    fn step(i: &mut Idx) {
+        *i += Idx::one();
+    }
+}
+
+impl<Idx> Direction<Idx> for Downwards
+where
+    Idx: One + SubAssign,
+{
+    fn step(i: &mut Idx) {
+        *i -= Idx::one();
+    }
+}
+
 /// Range counting up
-impl<Idx> Range<Idx, Upwards>
+impl<Idx, Dir> Range<Idx, Dir>
 where
     Idx: Clone + PartialEq + One + AddAssign + SubAssign,
+    Dir: Clone + Direction<Idx>,
 {
     /// Collect range into a container
     ///
@@ -238,83 +265,13 @@ where
     }
 }
 
-/// Range counting down
-impl<Idx> Range<Idx, Downwards>
+impl<Idx, Dir> IntoIterator for Range<Idx, Dir>
 where
     Idx: Clone + PartialEq + One + AddAssign + SubAssign,
-{
-    /// Collect range into a container
-    ///
-    /// Works for any container type that implements [`FromIterator`].
-    ///
-    /// # Examples
-    ///
-    /// Basic usage, creating a [`Vec`]. See also [`Range::to_vec`]
-    ///
-    /// ```rust
-    /// extern crate a_range;
-    ///
-    /// let collection: Vec<_> = a_range::from(42).down_to(38).collect();
-    ///
-    /// assert_eq!(collection, vec![42, 41, 40, 39, 38]);
-    /// ```
-    ///
-    /// Using `collect()` to make a [`std::collections::HashSet`]
-    ///
-    /// ```rust
-    /// extern crate a_range;
-    /// use std::collections::HashSet;
-    ///
-    /// let collection: HashSet<_> = a_range::from(42).down_to(38).collect();
-    ///
-    /// assert!(collection.contains(&39));
-    /// ```
-    pub fn collect<B>(self) -> B
-    where
-        B: FromIterator<Idx>,
-    {
-        self.into_iter().collect()
-    }
-
-    /// Turn range into a [Vec]
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// extern crate a_range;
-    ///
-    /// let vector = a_range::from(42).down_to(38).to_vec();
-    ///
-    /// assert_eq!(vector, vec![42, 41, 40, 39, 38]);
-    /// ```
-    pub fn to_vec(&self) -> Vec<Idx> {
-        self.clone().into_iter().collect()
-    }
-}
-
-impl<Idx> IntoIterator for Range<Idx, Upwards>
-where
-    Idx: Clone + PartialEq + One + AddAssign + SubAssign,
+    Dir: Direction<Idx>,
 {
     type Item = Idx;
-    type IntoIter = RangeIter<Idx, Upwards>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        RangeIter {
-            current: self.from,
-            limit: self.to,
-            direction: self.direction,
-            init: false,
-        }
-    }
-}
-
-impl<Idx> IntoIterator for Range<Idx, Downwards>
-where
-    Idx: Clone + PartialEq + One + AddAssign + SubAssign,
-{
-    type Item = Idx;
-    type IntoIter = RangeIter<Idx, Downwards>;
+    type IntoIter = RangeIter<Idx, Dir>;
 
     fn into_iter(self) -> Self::IntoIter {
         RangeIter {
@@ -375,7 +332,7 @@ where
 /// Conversions to [`std::ops::RangeInclusive`]
 impl<Idx> Range<Idx, Upwards>
 where
-    Idx: Clone,
+    Idx: Clone + One + AddAssign,
 {
     /// Turn range into a [`std::ops::RangeInclusive`]
     ///
@@ -396,7 +353,7 @@ where
 /// Conversions to [`std::ops::RangeInclusive`]
 impl<Idx> Into<std::ops::RangeInclusive<Idx>> for Range<Idx, Upwards>
 where
-    Idx: Clone,
+    Idx: Clone + One + AddAssign,
 {
     /// Turn range into a [`std::ops::RangeInclusive`]
     ///
@@ -430,27 +387,39 @@ pub struct RangeIter<Idx, Direction> {
     init: bool,
 }
 
-/// Iterate over a reverse range
+/// Iterate over a the provided range
 ///
 /// # Examples
 ///
 /// ```rust
 /// extern crate a_range;
 ///
-/// let x = a_range::from(1).up_to(3);
-/// let mut iter = x.into_iter();
+/// let up = a_range::from(1).up_to(3);
+/// let mut up_iter = up.into_iter();
 ///
 /// // Each call to `next()` gives us the next number in the range:
-/// assert_eq!(iter.next(), Some(1));
-/// assert_eq!(iter.next(), Some(2));
-/// assert_eq!(iter.next(), Some(3));
+/// assert_eq!(up_iter.next(), Some(1));
+/// assert_eq!(up_iter.next(), Some(2));
+/// assert_eq!(up_iter.next(), Some(3));
 ///
 /// // Until the range is done
-/// assert_eq!(iter.next(), None);
+/// assert_eq!(up_iter.next(), None);
+///
+/// let down = a_range::from(3).down_to(1);
+/// let mut down = down.into_iter();
+///
+/// // Each call to `next()` gives us the next number in the range:
+/// assert_eq!(down.next(), Some(3));
+/// assert_eq!(down.next(), Some(2));
+/// assert_eq!(down.next(), Some(1));
+///
+/// // Until the range is done
+/// assert_eq!(down.next(), None);
 /// ```
-impl<Idx> Iterator for RangeIter<Idx, Upwards>
+impl<Idx, Dir> Iterator for RangeIter<Idx, Dir>
 where
     Idx: Clone + PartialEq + One + AddAssign + SubAssign,
+    Dir: Direction<Idx>,
 {
     type Item = Idx;
 
@@ -465,48 +434,7 @@ where
             return None;
         }
 
-        self.current += Idx::one();
-
-        Some(self.current.clone())
-    }
-}
-
-/// Iterate over a reverse range
-///
-/// # Examples
-///
-/// ```rust
-/// extern crate a_range;
-///
-/// let x = a_range::from(3).down_to(1);
-/// let mut iter = x.into_iter();
-///
-/// // Each call to `next()` gives us the next number in the range:
-/// assert_eq!(iter.next(), Some(3));
-/// assert_eq!(iter.next(), Some(2));
-/// assert_eq!(iter.next(), Some(1));
-///
-/// // Until the range is done
-/// assert_eq!(iter.next(), None);
-/// ```
-impl<Idx> Iterator for RangeIter<Idx, Downwards>
-where
-    Idx: Clone + PartialEq + One + AddAssign + SubAssign,
-{
-    type Item = Idx;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        if !self.init {
-            self.init = true;
-
-            return Some(self.current.clone());
-        }
-
-        if self.current == self.limit {
-            return None;
-        }
-
-        self.current -= Idx::one();
+        Dir::step(&mut self.current);
 
         Some(self.current.clone())
     }
