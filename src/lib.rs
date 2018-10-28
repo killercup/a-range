@@ -202,6 +202,10 @@ where
     ///
     /// assert_eq!(collection, vec![3, 6, 9]);
     /// ```
+    ///
+    /// # Note
+    ///
+    /// Clones both upper and lower bounds of the index to be owned by the returned iterator.
     pub fn iter(&self) -> RangeIter<Idx, Upwards> {
         self.into_iter()
     }
@@ -274,6 +278,10 @@ where
     /// }
     ///
     /// assert_eq!(collection, vec![9, 6, 3]);
+    ///
+    /// # Note
+    ///
+    /// Clones both upper and lower bounds of the index to be owned by the returned iterator.
     /// ```
     pub fn iter(&self) -> RangeIter<Idx, Downwards> {
         self.into_iter()
@@ -335,6 +343,11 @@ where
     type Item = Idx;
     type IntoIter = RangeIter<Idx, Upwards>;
 
+    /// Returns an iterator without consuming the range
+    ///
+    /// # Note
+    ///
+    /// Clones both upper and lower bounds of the index to be owned by the returned iterator.
     fn into_iter(self) -> Self::IntoIter {
         RangeIter {
             current: self.from.clone(),
@@ -352,6 +365,11 @@ where
     type Item = Idx;
     type IntoIter = RangeIter<Idx, Upwards>;
 
+    /// Returns an iterator without consuming the range
+    ///
+    /// # Note
+    ///
+    /// Clones both upper and lower bounds of the index to be owned by the returned iterator.
     fn into_iter(self) -> Self::IntoIter {
         RangeIter {
             current: self.from,
