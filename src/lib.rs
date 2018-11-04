@@ -42,6 +42,7 @@ extern crate docmatic;
 
 use num_traits::{Bounded, One};
 use std::iter::FromIterator;
+use std::marker::PhantomData;
 use std::ops::{AddAssign, SubAssign};
 
 /// Start constructing a new [Range].
@@ -96,7 +97,7 @@ where
         Range {
             from: self.from,
             to: x,
-            direction: Upwards,
+            direction: PhantomData,
         }
     }
 
@@ -113,7 +114,7 @@ where
         Range {
             from: self.from,
             to: x,
-            direction: Downwards,
+            direction: PhantomData,
         }
     }
 }
@@ -136,7 +137,7 @@ where
         Range {
             from: self.from,
             to: Idx::max_value(),
-            direction: Upwards,
+            direction: PhantomData,
         }
     }
 }
@@ -158,7 +159,7 @@ pub struct Range<Idx, Dir>
 where
     Dir: Direction<Idx>,
 {
-    direction: Dir,
+    direction: PhantomData<Dir>,
     from: Idx,
     to: Idx,
 }
@@ -170,11 +171,7 @@ impl<T: Copy, Dir: Copy + Direction<T>> Copy for Range<T, Dir> {}
 fn copyable_range_is_copy() {
     fn is_copy<T: Copy>(_x: T) {}
 
-    let range = Range {
-        direction: Upwards,
-        from: 0,
-        to: 100,
-    };
+    let range = from(0).up_to(100);
     is_copy(range);
 }
 
@@ -300,7 +297,7 @@ where
         RangeIter {
             current: self.from,
             limit: self.to,
-            direction: self.direction,
+            direction: PhantomData,
             init: false,
         }
     }
@@ -323,7 +320,7 @@ where
         RangeIter {
             current: self.from.clone(),
             limit: self.to.clone(),
-            direction: self.direction.clone(),
+            direction: PhantomData,
             init: false,
         }
     }
@@ -428,8 +425,7 @@ where
 pub struct RangeIter<Idx, Direction> {
     current: Idx,
     limit: Idx,
-    #[allow(unused)]
-    direction: Direction,
+    direction: PhantomData<Direction>,
     init: bool,
 }
 
