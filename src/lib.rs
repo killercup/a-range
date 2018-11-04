@@ -449,7 +449,7 @@ pub struct RangeIter<Idx, Direction> {
     init: bool,
 }
 
-/// Iterate over a the provided range
+/// Iterate over a provided range
 ///
 /// # Examples
 ///
