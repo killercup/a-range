@@ -278,11 +278,11 @@ where
     /// }
     ///
     /// assert_eq!(collection, vec![9, 6, 3]);
+    /// ```
     ///
     /// # Note
     ///
     /// Clones both upper and lower bounds of the index to be owned by the returned iterator.
-    /// ```
     pub fn iter(&self) -> RangeIter<Idx, Downwards> {
         self.into_iter()
     }
