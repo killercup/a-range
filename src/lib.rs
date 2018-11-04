@@ -271,7 +271,6 @@ where
     ///
     /// assert!(collection.contains(&42));
     /// ```
-    ///
     pub fn collect<B>(self) -> B
     where
         B: FromIterator<Idx>,
@@ -289,6 +288,16 @@ where
     /// let vector = a_range::from(42).up_to(45).to_vec();
     ///
     /// assert_eq!(vector, vec![42, 43, 44, 45]);
+    /// ```
+    ///
+    /// Works for downward ranges, too:
+    ///
+    /// ```rust
+    /// extern crate a_range;
+    ///
+    /// let vector = a_range::from(42).down_to(38).to_vec();
+    ///
+    /// assert_eq!(vector, vec![42, 41, 40, 39, 38]);
     /// ```
     pub fn to_vec(&self) -> Vec<Idx> {
         self.iter().collect()
