@@ -184,7 +184,7 @@ pub struct Upwards;
 pub struct Downwards;
 
 #[doc(hidden)]
-pub trait Direction<Idx>: Clone {
+pub trait Direction<Idx>: Clone + private::Sealed {
     fn step(i: &mut Idx);
 }
 
@@ -204,6 +204,17 @@ where
     fn step(i: &mut Idx) {
         *i -= Idx::one();
     }
+}
+
+/// Sealed trait so downstream crates can't implement `Direction`
+///
+/// cf. [Future proofing](https://rust-lang-nursery.github.io/api-guidelines/future-proofing.html)
+/// section of the Rust API Guidelines.
+mod private {
+    pub trait Sealed {}
+
+    impl Sealed for super::Upwards {}
+    impl Sealed for super::Downwards {}
 }
 
 /// Range counting up
