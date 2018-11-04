@@ -165,7 +165,7 @@ where
 }
 
 /// Implement copy for Ranges with copyable indices
-impl<T: Copy, Dir: Copy + Direction<T>> Copy for Range<T, Dir> {}
+impl<Idx: Copy, Dir: Copy + Direction<Idx>> Copy for Range<Idx, Dir> {}
 
 #[test]
 fn copyable_range_is_copy() {
