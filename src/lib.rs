@@ -89,6 +89,10 @@ where
     /// # Panics
     ///
     /// This function will panic when trying to create a [Range] where the upper bound is less than the lower bound.
+    ///
+    /// ```should_panic
+    /// a_range::from(40).up_to(39);
+    /// ```
     pub fn up_to(self, x: Idx) -> Range<Idx, Upwards> {
         if self.from > x {
             panic!("Invalid range: upper bound cannot be lesser than lower bound!");
@@ -106,6 +110,10 @@ where
     /// # Panics
     ///
     /// This function will panic when trying to create a [Range] where the lower bound is less than the upper bound.
+    ///
+    /// ```should_panic
+    /// a_range::from(40).down_to(41);
+    /// ```
     pub fn down_to(self, x: Idx) -> Range<Idx, Downwards> {
         if self.from < x {
             panic!("Invalid range: lower bound cannot be lesser than upper bound!");
